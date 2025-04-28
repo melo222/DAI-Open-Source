@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include "frame_queue.h"
 
 // Dichiarazione e inizializzazione della coda condivisa (globale)
 frame_queue_t frame_queue;

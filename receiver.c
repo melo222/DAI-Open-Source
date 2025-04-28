@@ -3,6 +3,7 @@
 #include <pcap.h>
 #include <pthread.h>
 #include <string.h>
+#include "frame_queue.h"
 
 // Struttura per passare l'interfaccia al thread
 typedef struct {

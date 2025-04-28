@@ -1,25 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
+#include "frame_queue.h"
 
-#define MAX_QUEUE_SIZE 100 // Dimensione massima della coda
-
-// Struttura per rappresentare una trama
-typedef struct {
-    unsigned char *data;
-    int len;
-} frame_t;
-
-// Struttura per la coda
-typedef struct {
-    frame_t *buffer[MAX_QUEUE_SIZE];
-    int head;
-    int tail;
-    int count;
-    pthread_mutex_t mutex;
-    pthread_cond_t not_full;
-    pthread_cond_t not_empty;
-} frame_queue_t;
+#define MAX_QUEUE_SIZE 100
 
 // Inizializza la coda
 void queue_init(frame_queue_t *queue) {

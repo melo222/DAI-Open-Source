@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "frame_queue.h"
 
 // Dichiarazione della coda condivisa (assicurati che sia globale o passata ai thread)
 extern frame_queue_t frame_queue;
