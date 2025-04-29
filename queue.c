@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <string.h>
-#include "frame_queue.h"
+#include "arp_queue.h"
 
-#define MAX_QUEUE_SIZE 100
-
-// Inizializza la coda
-void queue_init(frame_queue_t *queue) {
+void arp_queue_init(arp_association_queue_t *queue) {
     queue->head = 0;
     queue->tail = 0;
     queue->count = 0;
@@ -16,60 +12,45 @@ void queue_init(frame_queue_t *queue) {
     pthread_cond_init(&queue->not_empty, NULL);
 }
 
-// Inserisci una trama nella coda
-void enqueue_frame(frame_queue_t *queue, const unsigned char *frame, int len) {
+void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association) {
     pthread_mutex_lock(&queue->mutex);
-    while (queue->count == MAX_QUEUE_SIZE) {
-        // La coda è piena, attendi che ci sia spazio
+    while (queue->count == ARP_QUEUE_SIZE) { // Usa la dimensione definita nell'header
         pthread_cond_wait(&queue->not_full, &queue->mutex);
     }
 
-    queue->buffer[queue->tail] = malloc(sizeof(frame_t));
-    if (queue->buffer[queue->tail] == NULL) {
-        perror("Errore nell'allocazione di memoria per la trama");
+    arp_association_t *new_association = malloc(sizeof(arp_association_t));
+    if (new_association == NULL) {
+        perror("Errore nell'allocazione di memoria per l'associazione ARP");
         pthread_mutex_unlock(&queue->mutex);
         return;
     }
-    queue->buffer[queue->tail]->data = malloc(len);
-    if (queue->buffer[queue->tail]->data == NULL) {
-        perror("Errore nell'allocazione di memoria per i dati della trama");
-        free(queue->buffer[queue->tail]);
-        pthread_mutex_unlock(&queue->mutex);
-        return;
-    }
-    memcpy(queue->buffer[queue->tail]->data, frame, len);
-    queue->buffer[queue->tail]->len = len;
+    memcpy(new_association, &association, sizeof(arp_association_t));
 
-    queue->tail = (queue->tail + 1) % MAX_QUEUE_SIZE;
+    queue->buffer[queue->tail] = new_association;
+    queue->tail = (queue->tail + 1) % ARP_QUEUE_SIZE; // Usa la dimensione definita nell'header
     queue->count++;
 
-    // Segnala che la coda non è più vuota
     pthread_cond_signal(&queue->not_empty);
     pthread_mutex_unlock(&queue->mutex);
 }
 
-// Estrai una trama dalla coda
-frame_t *dequeue_frame(frame_queue_t *queue) {
+arp_association_t *dequeue_arp_association(arp_association_queue_t *queue) {
     pthread_mutex_lock(&queue->mutex);
     while (queue->count == 0) {
-        // La coda è vuota, attendi che ci siano elementi
         pthread_cond_wait(&queue->not_empty, &queue->mutex);
     }
 
-    frame_t *frame = queue->buffer[queue->head];
-    queue->head = (queue->head + 1) % MAX_QUEUE_SIZE;
+    arp_association_t *association = queue->buffer[queue->head];
+    queue->head = (queue->head + 1) % ARP_QUEUE_SIZE; // Usa la dimensione definita nell'header
     queue->count--;
 
-    // Segnala che la coda non è più piena
     pthread_cond_signal(&queue->not_full);
     pthread_mutex_unlock(&queue->mutex);
-    return frame;
+    return association;
 }
 
-// Funzione per liberare la memoria di una trama estratta
-void free_frame(frame_t *frame) {
-    if (frame) {
-        free(frame->data);
-        free(frame);
+void free_arp_association(arp_association_t *association) {
+    if (association) {
+        free(association);
     }
 }
