@@ -5,26 +5,32 @@
 #include <string.h>
 #include <netinet/if_ether.h>
 #include <arpa/inet.h>
-#include "arp_queue.h" // Includi l'header per la coda ARP
+#include "arp_queue.h" // header per la coda ARP
 
-// Struttura per passare l'interfaccia al thread (non serve più il filtro qui)
+// Dichiarazione esterna del mutex
+extern pthread_mutex_t stdout_mutex;
+
+
+// struttura per passare l'interfaccia al thread (non serve più il filtro qui)
 typedef struct {
     char *interface;
-    // Altri parametri se necessario
-} receiver_args_t;
+    // + altro ?
+} interface;
 
-// Prototipo per inserire l'associazione ARP nella coda
+// prototipo per inserire l'associazione ARP nella coda
 void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association);
 
-void *receiver_thread(void *arg) {
-    receiver_args_t *args = (receiver_args_t *)arg;
+void *receiver_thread(void *iface) {
+    interface *args = (interface *)iface;
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
     struct bpf_program fp;
     bpf_u_int32 net;
     bpf_u_int32 mask;
 
+    pthread_mutex_lock(&stdout_mutex);
     printf("Thread ricevitore ARP avviato per l'interfaccia: %s (solo ARP Reply)\n", args->interface);
+    pthread_mutex_unlock(&stdout_mutex);
 
     handle = pcap_open_live(args->interface, BUFSIZ, 1, 1000, errbuf);
     if (handle == NULL) {
@@ -32,7 +38,6 @@ void *receiver_thread(void *arg) {
         pthread_exit(NULL);
     }
 
-    // Compila e imposta il filtro per ARP Reply
     const char *arp_filter = "arp and arp[7] == 2";
     if (pcap_compile(handle, &fp, arp_filter, 1, net) == -1) {
         fprintf(stderr, "Errore nella compilazione del filtro ARP: %s\n", pcap_geterr(handle));
@@ -53,31 +58,44 @@ void *receiver_thread(void *arg) {
     while (1) {
         packet = pcap_next(handle, &header);
         if (packet) {
-            // Verifica che la lunghezza del pacchetto sia sufficiente per un ARP Reply
+            // verifica della lunghezza del pacchetto sia sufficiente per un ARP Reply
             if (header.caplen >= 14 + 28) { // Ethernet header + ARP header minimo
-                const unsigned char *arp_header = packet + 14; // Salta l'header Ethernet
+                // estrae il MAC addr nell'header Ethernet (del Sender)
+                const unsigned char *mac_sender = packet + 6; // cosí ho modo di fare un allert a posteriori
 
-                // Estrai l'indirizzo MAC del mittente (Target MAC in Reply) - offset 22
-                const unsigned char *mac_sender = arp_header + 6; // Offset del Sender MAC
-                // Estrai l'indirizzo IP del mittente (Target IP in Reply) - offset 28
-                const unsigned char *ip_sender_bytes = arp_header + 14; // Offset del Sender IP
-                struct in_addr ip_sender_addr;
-                memcpy(&ip_sender_addr.s_addr, ip_sender_bytes, 4);
+                const unsigned char *arp_header = packet + 14; // Salto aal'header Ethernet
 
+                // estrae l'indirizzo MAC del mittente (target MAC in ARP Reply) - offset 20
+                const unsigned char *mac_bind = arp_header + 6; 
+ 
+                // estrai l'indirizzo IP del mittente (target IP in ARP Reply) - offset 26
+                const unsigned char *ip_bind = arp_header + 14; 
+
+                // mi salvo i bytes dell'IP all'offset ip_bind
+                //struct in_addr ip_sender_addr;
+                // memcpy(&ip_sender_addr.s_addr, ip_bind, 4);
+
+                // creo l'associazione con mac_bind e ip_bind
                 arp_association_t association;
-                memcpy(association.mac_addr, mac_sender, ETH_ALEN);
-                association.ip_addr = ip_sender_addr;
-
-                // Inserisci l'associazione nella coda dedicata
-                extern arp_association_queue_t arp_association_queue; // Dichiarazione della coda globale
-                enqueue_arp_association(&arp_association_queue, association);
-
-                // Puoi stampare l'associazione qui per verifica
+                memcpy(association.mac_addr, mac_bind, ETH_ALEN);
+                memcpy(&association.ip_addr, ip_bind, 4);
+                memcpy(association.mac_addr_sender, mac_sender, ETH_ALEN);
+                // association.ip_addr = ip_sender_addr;
+                char ip_str[4];
                 char mac_str[18];
+                inet_ntop(AF_INET,&association.ip_addr,ip_str,INET_ADDRSTRLEN);
                 sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
-                        association.mac_addr[0], association.mac_addr[1], association.mac_addr[2],
-                        association.mac_addr[3], association.mac_addr[4], association.mac_addr[5]);
-                printf("ARP Reply trovato: Sender MAC=%s, Sender IP=%s\n", mac_str, inet_ntoa(association.ip_addr));
+                    association.mac_addr[0], association.mac_addr[1], association.mac_addr[2],
+                    association.mac_addr[3], association.mac_addr[4], association.mac_addr[5]);
+                pthread_mutex_lock(&stdout_mutex);
+                printf("[%s] Associazione memorizzata in arp_association_t:\n[-] MAC -> %s \n[-] IP -> %s\n", args->interface, mac_str, ip_str);
+                pthread_mutex_unlock(&stdout_mutex);
+
+                // metto in coda l'associazione appena costituita
+                arp_association_queue_t arp_association_queue; // Dichiarazione della coda globale
+                enqueue_arp_association(&arp_association_queue, association); // chiamata di enqueue in queue.c
+
+                //printf("ARP Reply trovato: Sender MAC=%s, Sender IP=%s\n", mac_str, inet_ntoa(association.ip_addr));
             }
         }
     }
@@ -87,19 +105,20 @@ void *receiver_thread(void *arg) {
 }
 
 // Funzione per avviare un thread ricevitore per una data interfaccia
-pthread_t start_receiver_thread(const char *interface_name) {
+pthread_t start_receiver_thread(const char *iface) {
+    printf(" - %s interface.\n",iface);
     pthread_t receiver_tid;
-    receiver_args_t *args = malloc(sizeof(receiver_args_t));
+    interface *args = malloc(sizeof(interface));
     if (args == NULL) {
-        perror("Errore nell'allocazione di memoria per gli argomenti del thread ricevitore");
-        exit(EXIT_FAILURE);
+        printf("Errore nell'allocazione di memoria per gli argomenti del thread ricevitore");
+        exit(1);
     }
-    args->interface = strdup(interface_name);
+    args->interface = strdup(iface);
     if (pthread_create(&receiver_tid, NULL, receiver_thread, (void *)args) != 0) {
-        perror("Errore nella creazione del thread ricevitore");
+        printf("Errore nella creazione del thread ricevitore");
         free(args->interface);
         free(args);
-        exit(EXIT_FAILURE);
+        exit(1);
     }
     return receiver_tid;
 }

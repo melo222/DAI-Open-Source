@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
 #include "arp_queue.h"
 
 void arp_queue_init(arp_association_queue_t *queue) {

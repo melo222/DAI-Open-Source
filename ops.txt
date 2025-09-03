@@ -1,1 +1,1 @@
-gcc main.c receiver.c queue.c analyzer.c -o network_analyzer -lpcap -lpthread
+gcc main.c receiver.c queue.c analyzer.c arp_queue.h -o network_analyzer -lpcap -lpthread
