@@ -1,1 +1,1 @@
-gcc main.c receiver.c queue.c analyzer.c arp_queue.h -o network_analyzer -lpcap -lpthread
+gcc -Wall -Wextra queue.c main.c receiver.c analyzer.c lease_t.c -o network_analyzer -lpcap -lpthread

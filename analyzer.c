@@ -2,56 +2,91 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <arpa/inet.h> // Per inet_ntoa
+#include "analyzer_t.h"
 #include "arp_queue.h"
 
-// Dichiarazione esterna del mutex
-extern pthread_mutex_t stdout_mutex;
-
-
-
-#include <time.h> // per fermare random una analisi fino a quando non la sviluppo
-
-
-// Dichiarazione della coda condivisa di associazioni ARP (assicurati che sia globale o passata ai thread)
-arp_association_queue_t arp_association_queue;
-
 // Funzione di esempio per analizzare un'associazione ARP
-void analyze_arp_association(arp_association_t *association) {
-    char mac_str[18], mac_sender[18];
-    sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
-            association->mac_addr[0], association->mac_addr[1], association->mac_addr[2],
-            association->mac_addr[3], association->mac_addr[4], association->mac_addr[5]);
-    sprintf(mac_sender, "%02x:%02x:%02x:%02x:%02x:%02x",
-            association->mac_addr_sender[0], association->mac_addr_sender[1], association->mac_addr_sender[2],
-            association->mac_addr_sender[3], association->mac_addr_sender[4], association->mac_addr_sender[5]);
-    char ip_addr[4];
+// si può eliminare il parametro stdout-mutex perchè già presente nella cache
+void analyze_arp_association(arp_association_t *association, lease_cache_t *lease_cache) {
+    char mac_str[18], mac_sender[18], ip_addr[INET_ADDRSTRLEN];
+      
+    mac_to_str(association->mac_addr,mac_str);
+    mac_to_str(association->mac_addr_sender,mac_sender);
     inet_ntop(AF_INET,&association->ip_addr,ip_addr,INET_ADDRSTRLEN);
-    printf("Thread analizzatore %lu ha estratto dalla queue: MAC=%s, IP=%s\n",
-           pthread_self(), mac_str, ip_addr);
-    
-    /*
-    
-    SCRIVERE QUI L'ANALISI TRAMITE DHCP CHECK
-    
-    */
-    srand(time(NULL));
 
-    if ((rand()%21) == 3){
+    pthread_mutex_lock(lease_cache->stdout_mutex);
+    printf("Thread analizzatore %lu ha estratto dalla queue: MAC=%s, IP=%s, MAC_SENDER=%s\n",
+           pthread_self(), mac_str, ip_addr, mac_sender);
+    pthread_mutex_unlock(lease_cache->stdout_mutex);
+
+    // pthread_mutex_lock(lease_cache->stdout_mutex);
+    // printf("pre lease_cache_check\n");
+    // pthread_mutex_unlock(lease_cache->stdout_mutex);
+    
+    int is_valid = lease_cache_check(lease_cache, ip_addr, mac_str);
+
+    pthread_mutex_lock(lease_cache->stdout_mutex);
+    if (is_valid){
         printf("============================================\n");        
         printf("FINTA ANALISI TERMINATA, ECCEZIONE SOLLEVATA\n");
         printf("============================================\n");
-        printf("========%s========",mac_sender);
+        printf("==========MAC=%s=============\n",mac_sender);
     }
+    else{
+        printf("Analisi terminata, eccezione NON sollevata\n\n");
+    }
+    pthread_mutex_unlock(lease_cache->stdout_mutex);
+
+    /*
+    
+    srand(time(NULL));
+
+    pthread_mutex_lock(stdout_mutex);
+    if ((rand()%10) == 3){
+        printf("============================================\n");        
+        printf("FINTA ANALISI TERMINATA, ECCEZIONE SOLLEVATA\n");
+        printf("============================================\n");
+        printf("==========MAC=%s=============\n",mac_sender);
+    }
+    else{
+        printf("Analisi terminata, eccezione NON sollevata\n");
+    }
+    pthread_mutex_unlock(stdout_mutex);
+
+    */
+
 }
 
+
 // la routine eseguita per ogni thread
-void *analyzer_thread(void *arg) {
+void *analyzer_thread(void *args) {
+    analyzer_t_args *t_args = (analyzer_t_args *) args;
+    arp_association_queue_t *arp_queue = t_args->queue; // Dichiarazione della coda globale
+
+    pthread_mutex_lock(t_args->stdout_mutex);
+    printf("\t - Thread Analyzer numero:%d avviato\n", t_args->num);
+    pthread_mutex_unlock(t_args->stdout_mutex);
+
     while (1) {
         // prendo dalla funzione implementata in queue.c una associazione e la passo al thread
-        arp_association_t *association = dequeue_arp_association(&arp_association_queue); 
+        arp_association_t *association = dequeue_arp_association(arp_queue);
+
+        // pthread_mutex_lock(t_args->stdout_mutex);
+        // printf("associazione dequeued\n");
+        // pthread_mutex_unlock(t_args->stdout_mutex);
+
         if (association) {
-            analyze_arp_association(association); 
-            free_arp_association(association); // Implementata in queue
+            analyze_arp_association(association,t_args->lease_cache); 
+
+            // pthread_mutex_lock(t_args->stdout_mutex);
+            // printf("associazione analizzata\n");
+            // pthread_mutex_unlock(t_args->stdout_mutex);
+
+            free_arp_association(association);     // Implementata in queue
+
+            // pthread_mutex_lock(t_args->stdout_mutex);
+            // printf("associazione freed\n");
+            // pthread_mutex_unlock(t_args->stdout_mutex);
         }
         // Se la coda è vuota, il thread rimarrà bloccato nella dequeue fino a quando non arriva una nuova associazione
     }
@@ -59,14 +94,13 @@ void *analyzer_thread(void *arg) {
 }
 
 // Funzione per creare e avviare il pool di thread analizzatori di ARP
-void start_arp_analyzer_pool(int num_threads) {
-    pthread_t analyzer_tids[num_threads];
-    // ciclo che esegue pthread_create, funzione per creare thread ed eseguire una routine annessa
-    for (int i = 0; i < num_threads; i++) {
-        if (pthread_create(&analyzer_tids[i], NULL, analyzer_thread, NULL) != 0) {
-            perror("Errore nella creazione del thread analizzatore ARP");
-            exit(EXIT_FAILURE);
-        }
-        printf("%d) Thread analizzatore ARP %lu creato.\n", i, analyzer_tids[i]);
+pthread_t start_analyzer_thread(analyzer_t_args* args, pthread_mutex_t* mutex) {
+    args->stdout_mutex = mutex;
+    pthread_t analyzer_tid;
+    if(pthread_create(&analyzer_tid, NULL, (void *) analyzer_thread, args) != 0) {
+        printf("Errore nella creazione del thread ricevitore");
+        free(args);
+        exit(1);
     }
+    return analyzer_tid;
 }

@@ -1,3 +1,5 @@
+#ifndef ARP_QUEUE_H
+#define ARP_QUEUE_H
 #include <pthread.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
@@ -20,12 +22,16 @@ typedef struct {
     pthread_mutex_t mutex;
     pthread_cond_t not_full;
     pthread_cond_t not_empty;
+    pthread_mutex_t *stdout_mutex;
 } arp_association_queue_t;
 
 // Dichiarazione della coda come esterna
-extern arp_association_queue_t arp_association_queue;
+// extern arp_association_queue_t arp_association_queue;
 
-void arp_queue_init(arp_association_queue_t *queue);
+void arp_queue_init(arp_association_queue_t *queue, pthread_mutex_t *stdout_mutex);
 void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association);
 arp_association_t *dequeue_arp_association(arp_association_queue_t *queue);
 void free_arp_association(arp_association_t *association);
+void list_arp_association(arp_association_queue_t *queue);
+char *mac_to_str(const unsigned char *mac_addr, char *mac_str);
+#endif 

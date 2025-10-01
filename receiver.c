@@ -6,46 +6,52 @@
 #include <netinet/if_ether.h>
 #include <arpa/inet.h>
 #include "arp_queue.h" // header per la coda ARP
-
+#include "receiver_t.h"
 // Dichiarazione esterna del mutex
-extern pthread_mutex_t stdout_mutex;
+// extern pthread_mutex_t stdout_mutex;
 
 
 // struttura per passare l'interfaccia al thread (non serve più il filtro qui)
-typedef struct {
-    char *interface;
-    // + altro ?
-} interface;
+// typedef struct {
+//     char *interface;
+//     // + altro ?
+// } interface;
 
 // prototipo per inserire l'associazione ARP nella coda
 void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association);
 
-void *receiver_thread(void *iface) {
-    interface *args = (interface *)iface;
+void *receiver_thread(void *args) {
+    receiver_t_args* t_args = (receiver_t_args *) args;
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
     struct bpf_program fp;
     bpf_u_int32 net;
-    bpf_u_int32 mask;
+    // bpf_u_int32 mask;
 
-    pthread_mutex_lock(&stdout_mutex);
-    printf("Thread ricevitore ARP avviato per l'interfaccia: %s (solo ARP Reply)\n", args->interface);
-    pthread_mutex_unlock(&stdout_mutex);
+    pthread_mutex_lock(t_args->stdout_mutex);
+    printf("\t - Thread Receiver ARP avviato per l'interfaccia: %s\n", t_args->interface);
+    pthread_mutex_unlock(t_args->stdout_mutex);
 
-    handle = pcap_open_live(args->interface, BUFSIZ, 1, 1000, errbuf);
+    handle = pcap_open_live(t_args->interface, BUFSIZ, 1, 1000, errbuf);
     if (handle == NULL) {
-        fprintf(stderr, "Impossibile aprire l'interfaccia %s: %s\n", args->interface, errbuf);
+        pthread_mutex_lock(t_args->stdout_mutex);
+        fprintf(stderr, "Impossibile aprire l'interfaccia %s: %s\n", t_args->interface, errbuf);
+        pthread_mutex_unlock(t_args->stdout_mutex);
         pthread_exit(NULL);
     }
 
     const char *arp_filter = "arp and arp[7] == 2";
-    if (pcap_compile(handle, &fp, arp_filter, 1, net) == -1) {
+    if (pcap_compile(handle, &fp, arp_filter, 1, net) == -1) {    
+        pthread_mutex_lock(t_args->stdout_mutex);
         fprintf(stderr, "Errore nella compilazione del filtro ARP: %s\n", pcap_geterr(handle));
+        pthread_mutex_unlock(t_args->stdout_mutex);
         pcap_close(handle);
         pthread_exit(NULL);
     }
     if (pcap_setfilter(handle, &fp) == -1) {
+        pthread_mutex_lock(t_args->stdout_mutex);
         fprintf(stderr, "Errore nell'impostazione del filtro ARP: %s\n", pcap_geterr(handle));
+        pthread_mutex_unlock(t_args->stdout_mutex);
         pcap_freecode(&fp);
         pcap_close(handle);
         pthread_exit(NULL);
@@ -58,6 +64,7 @@ void *receiver_thread(void *iface) {
     while (1) {
         packet = pcap_next(handle, &header);
         if (packet) {
+            
             // verifica della lunghezza del pacchetto sia sufficiente per un ARP Reply
             if (header.caplen >= 14 + 28) { // Ethernet header + ARP header minimo
                 // estrae il MAC addr nell'header Ethernet (del Sender)
@@ -66,35 +73,32 @@ void *receiver_thread(void *iface) {
                 const unsigned char *arp_header = packet + 14; // Salto aal'header Ethernet
 
                 // estrae l'indirizzo MAC del mittente (target MAC in ARP Reply) - offset 20
-                const unsigned char *mac_bind = arp_header + 6; 
+                const unsigned char *mac_bind = arp_header + 8;  //CORRETTO DA 6 A 8
  
                 // estrai l'indirizzo IP del mittente (target IP in ARP Reply) - offset 26
                 const unsigned char *ip_bind = arp_header + 14; 
 
-                // mi salvo i bytes dell'IP all'offset ip_bind
-                //struct in_addr ip_sender_addr;
-                // memcpy(&ip_sender_addr.s_addr, ip_bind, 4);
-
-                // creo l'associazione con mac_bind e ip_bind
+                // creo l'associazione con mac_bind, ip_bind e il mac_sender
                 arp_association_t association;
                 memcpy(association.mac_addr, mac_bind, ETH_ALEN);
                 memcpy(&association.ip_addr, ip_bind, 4);
                 memcpy(association.mac_addr_sender, mac_sender, ETH_ALEN);
-                // association.ip_addr = ip_sender_addr;
-                char ip_str[4];
-                char mac_str[18];
+                
+                char ip_str[INET_ADDRSTRLEN];
+                char mac_str[18],mac_sender_str[18];
                 inet_ntop(AF_INET,&association.ip_addr,ip_str,INET_ADDRSTRLEN);
-                sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
-                    association.mac_addr[0], association.mac_addr[1], association.mac_addr[2],
-                    association.mac_addr[3], association.mac_addr[4], association.mac_addr[5]);
-                pthread_mutex_lock(&stdout_mutex);
-                printf("[%s] Associazione memorizzata in arp_association_t:\n[-] MAC -> %s \n[-] IP -> %s\n", args->interface, mac_str, ip_str);
-                pthread_mutex_unlock(&stdout_mutex);
-
+                // conversione MAC address
+                mac_to_str(association.mac_addr,mac_str);
+                mac_to_str(association.mac_addr_sender,mac_sender_str);
+                // stampa
+                pthread_mutex_lock(t_args->stdout_mutex);
+                printf("[%d|%s] Associazione memorizzata in arp_association_t:\n   [-] MAC -> \t\t%s \n   [-] IP -> \t\t%s\n   [-] SENDER MAC ->\t%s\n",
+                    t_args->num, t_args->interface, mac_str, ip_str, mac_sender_str);
+                pthread_mutex_unlock(t_args->stdout_mutex);
                 // metto in coda l'associazione appena costituita
-                arp_association_queue_t arp_association_queue; // Dichiarazione della coda globale
-                enqueue_arp_association(&arp_association_queue, association); // chiamata di enqueue in queue.c
-
+                arp_association_queue_t *arp_queue = t_args->queue; // Dichiarazione della coda globale
+                enqueue_arp_association(arp_queue, association); // chiamata di enqueue in queue.c
+                // list_arp_association(arp_queue,t_args->stdout_mutex);
                 //printf("ARP Reply trovato: Sender MAC=%s, Sender IP=%s\n", mac_str, inet_ntoa(association.ip_addr));
             }
         }
@@ -105,18 +109,11 @@ void *receiver_thread(void *iface) {
 }
 
 // Funzione per avviare un thread ricevitore per una data interfaccia
-pthread_t start_receiver_thread(const char *iface) {
-    printf(" - %s interface.\n",iface);
+pthread_t start_receiver_thread(receiver_t_args* args, pthread_mutex_t* mutex) {
+    args->stdout_mutex = mutex;
     pthread_t receiver_tid;
-    interface *args = malloc(sizeof(interface));
-    if (args == NULL) {
-        printf("Errore nell'allocazione di memoria per gli argomenti del thread ricevitore");
-        exit(1);
-    }
-    args->interface = strdup(iface);
-    if (pthread_create(&receiver_tid, NULL, receiver_thread, (void *)args) != 0) {
+    if (pthread_create(&receiver_tid, NULL,(void *) receiver_thread, args) != 0) {
         printf("Errore nella creazione del thread ricevitore");
-        free(args->interface);
         free(args);
         exit(1);
     }

@@ -1,0 +1,126 @@
+==1751== Memcheck, a memory error detector
+==1751== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==1751== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==1751== Command: ./network_analyzer enp0s8 2
+==1751== 
+==1751== Invalid write of size 8
+==1751==    at 0x1097A4: main (in /tmp/DAI/network_analyzer)
+==1751==  Address 0x4e41e10 is 0 bytes after a block of size 16 alloc'd
+==1751==    at 0x48465EF: calloc (vg_replace_malloc.c:1328)
+==1751==    by 0x1096F9: main (in /tmp/DAI/network_analyzer)
+==1751== 
+==1751== Invalid write of size 4
+==1751==    at 0x109785: main (in /tmp/DAI/network_analyzer)
+==1751==  Address 0x4e41e20 is 16 bytes after a block of size 16 alloc'd
+==1751==    at 0x48465EF: calloc (vg_replace_malloc.c:1328)
+==1751==    by 0x1096F9: main (in /tmp/DAI/network_analyzer)
+==1751== 
+==1751== Invalid write of size 8
+==1751==    at 0x10A402: start_analyzer_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x1097CF: main (in /tmp/DAI/network_analyzer)
+==1751==  Address 0x4e41e28 is 24 bytes after a block of size 16 in arena "client"
+==1751== 
+==1751== Thread 4:
+==1751== Invalid read of size 8
+==1751==    at 0x10A362: analyzer_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x492D1F4: start_thread (pthread_create.c:442)
+==1751==    by 0x49ACB3F: clone (clone.S:100)
+==1751==  Address 0x4e41e10 is 0 bytes after a block of size 16 alloc'd
+==1751==    at 0x48465EF: calloc (vg_replace_malloc.c:1328)
+==1751==    by 0x1096F9: main (in /tmp/DAI/network_analyzer)
+==1751== 
+
+valgrind: m_mallocfree.c:303 (get_bszB_as_is): Assertion 'bszB_lo == bszB_hi' failed.
+valgrind: Heap block lo/hi size mismatch: lo = 80, hi = 137422170400.
+This is probably caused by your program erroneously writing past the
+end of a heap block and corrupting heap metadata.  If you fix any
+invalid writes reported by Memcheck, this assertion failure will
+probably go away.  Please try that before reporting this as a bug.
+
+
+host stacktrace:
+==1751==    at 0x580429AA: show_sched_status_wrk (m_libcassert.c:406)
+==1751==    by 0x58042AC7: report_and_quit (m_libcassert.c:477)
+==1751==    by 0x58042C57: vgPlain_assert_fail (m_libcassert.c:543)
+==1751==    by 0x5804C708: get_bszB_as_is (m_mallocfree.c:303)
+==1751==    by 0x5804C708: is_inuse_block (m_mallocfree.c:331)
+==1751==    by 0x5804C708: vgPlain_describe_arena_addr (m_mallocfree.c:1604)
+==1751==    by 0x5803B31A: vgPlain_describe_addr (m_addrinfo.c:185)
+==1751==    by 0x58039A1E: vgMemCheck_update_Error_extra (mc_errors.c:1185)
+==1751==    by 0x5803E1F5: vgPlain_maybe_record_error (m_errormgr.c:822)
+==1751==    by 0x58038CF8: vgMemCheck_record_address_error (mc_errors.c:765)
+==1751==    by 0x5800F063: mc_LOADVn_slow (mc_main.c:1557)
+==1751==    by 0x100403E8E8: ???
+==1751==    by 0x100688DF1F: ???
+==1751==    by 0x100688DF07: ???
+==1751==    by 0x100688DF1F: ???
+==1751==    by 0x8C4F: ???
+==1751==    by 0x100200F3AF: ???
+==1751==    by 0x201: ???
+==1751==    by 0x7: ???
+
+sched status:
+  running_tid=5
+
+Thread 1: status = VgTs_WaitSys syscall 202 (lwpid 1751)
+==1751==    at 0x4929F16: __futex_abstimed_wait_common64 (futex-internal.c:57)
+==1751==    by 0x4929F16: __futex_abstimed_wait_common (futex-internal.c:87)
+==1751==    by 0x492ECE2: __pthread_clockjoin_ex (pthread_join_common.c:102)
+==1751==    by 0x109820: main (in /tmp/DAI/network_analyzer)
+client stack range: [0x1FFEFFD000 0x1FFF000FFF] client SP: 0x1FFEFFE7E0
+valgrind stack range: [0x1002CAA000 0x1002DA9FFF] top usage: 18792 of 1048576
+
+Thread 2: status = VgTs_WaitSys syscall 230 (lwpid 1752)
+==1751==    at 0x4973545: clock_nanosleep@@GLIBC_2.17 (clock_nanosleep.c:48)
+==1751==    by 0x4977E52: nanosleep (nanosleep.c:25)
+==1751==    by 0x4977D89: sleep (sleep.c:55)
+==1751==    by 0x10A8FF: lease_updater_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x492D1F4: start_thread (pthread_create.c:442)
+==1751==    by 0x49ACB3F: clone (clone.S:100)
+client stack range: [0x5240000 0x5A3EFFF] client SP: 0x5A3EDA0
+valgrind stack range: [0x1005B64000 0x1005C63FFF] top usage: 3528 of 1048576
+
+Thread 3: status = VgTs_WaitSys syscall 257 (lwpid 1753)
+==1751==    at 0x499C080: open (open64.c:41)
+==1751==    by 0x485EFA2: ??? (in /usr/lib/x86_64-linux-gnu/libpcap.so.1.10.3)
+==1751==    by 0x4861856: ??? (in /usr/lib/x86_64-linux-gnu/libpcap.so.1.10.3)
+==1751==    by 0x486864C: pcap_activate (in /usr/lib/x86_64-linux-gnu/libpcap.so.1.10.3)
+==1751==    by 0x4868A47: pcap_open_live (in /usr/lib/x86_64-linux-gnu/libpcap.so.1.10.3)
+==1751==    by 0x10990E: receiver_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x492D1F4: start_thread (pthread_create.c:442)
+==1751==    by 0x49ACB3F: clone (clone.S:100)
+client stack range: [0x5A41000 0x623FFFF] client SP: 0x623E860
+valgrind stack range: [0x1005E6C000 0x1005F6BFFF] top usage: 3608 of 1048576
+
+Thread 4: status = VgTs_WaitSys syscall 202 (lwpid 1754)
+==1751==    at 0x4929F16: __futex_abstimed_wait_common64 (futex-internal.c:57)
+==1751==    by 0x4929F16: __futex_abstimed_wait_common (futex-internal.c:87)
+==1751==    by 0x492C5D7: __pthread_cond_wait_common (pthread_cond_wait.c:503)
+==1751==    by 0x492C5D7: pthread_cond_wait@@GLIBC_2.3.2 (pthread_cond_wait.c:618)
+==1751==    by 0x109E94: dequeue_arp_association (in /tmp/DAI/network_analyzer)
+==1751==    by 0x10A3B1: analyzer_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x492D1F4: start_thread (pthread_create.c:442)
+==1751==    by 0x49ACB3F: clone (clone.S:100)
+client stack range: [0x6242000 0x6A40FFF] client SP: 0x6A40CF0
+valgrind stack range: [0x100666A000 0x1006769FFF] top usage: 3440 of 1048576
+
+Thread 5: status = VgTs_Runnable (lwpid 1755)
+==1751==    at 0x10A36E: analyzer_thread (in /tmp/DAI/network_analyzer)
+==1751==    by 0x492D1F4: start_thread (pthread_create.c:442)
+==1751==    by 0x49ACB3F: clone (clone.S:100)
+client stack range: [0x6A43000 0x7241FFF] client SP: 0x7241E20
+valgrind stack range: [0x100678E000 0x100688DFFF] top usage: 4904 of 1048576
+
+
+Note: see also the FAQ in the source distribution.
+It contains workarounds to several common problems.
+In particular, if Valgrind aborted or crashed after
+identifying problems in your program, there's a good chance
+that fixing those problems will prevent Valgrind aborting or
+crashing, especially if it happened in m_mallocfree.c.
+
+If that doesn't help, please report this bug to: www.valgrind.org
+
+In the bug report, send all the above text, the valgrind
+version, and what OS and version you are using.  Thanks.
+
