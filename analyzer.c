@@ -27,13 +27,13 @@ void analyze_arp_association(arp_association_t *association, lease_cache_t *leas
 
     pthread_mutex_lock(lease_cache->stdout_mutex);
     if (is_valid){
+        printf("Analisi terminata, eccezione NON sollevata\n\n");
+    }
+    else{
         printf("============================================\n");        
         printf("FINTA ANALISI TERMINATA, ECCEZIONE SOLLEVATA\n");
         printf("============================================\n");
         printf("==========MAC=%s=============\n",mac_sender);
-    }
-    else{
-        printf("Analisi terminata, eccezione NON sollevata\n\n");
     }
     pthread_mutex_unlock(lease_cache->stdout_mutex);
 

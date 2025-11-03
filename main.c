@@ -17,6 +17,9 @@
 // pthread_mutex_t stdout_mutex;
 
 int main(int argc, char *argv[]) {
+
+    setvbuf(stdout, NULL, _IONBF, 0); 
+
     if (argc < 3) {
         fprintf(stderr, "Uso: %s <interfaccia1> [interfaccia2 ...] <num_thread_analizzatori>\n", argv[0]);
         return 1;
@@ -97,8 +100,6 @@ int main(int argc, char *argv[]) {
     }
     pthread_mutex_lock(&stdout_mutex);
     printf("Avvio dei thread analizzatori:\n");
-    printf("DEBUG: &stdout_mutex = %p\n", (void*)&stdout_mutex);
-    printf("DEBUG: lease_cache.stdout_mutex = %p\n", (void*)lease_cache.stdout_mutex);
     pthread_mutex_unlock(&stdout_mutex);
 
     // avvio gli analyzers

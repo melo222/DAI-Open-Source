@@ -49,15 +49,30 @@ int lease_cache_update(lease_cache_t *cache) {
     size_t current_capacity = 32;
     size_t new_count = 0;
 
-    // Alloca capacità iniziale
     new_entries = malloc(current_capacity * sizeof(lease_entry_t));
     if (new_entries == NULL) {
         fclose(file);
         return -1;
     }
 
+    //INSERIMENTO DELL'ENTRY FISSA DEL ROUTER
+    strncpy(new_entries[0].ip, ROUTER_IP_STR, sizeof(new_entries[0].ip));
+    strncpy(new_entries[0].mac, ROUTER_MAC_STR, sizeof(new_entries[0].mac));
+    // check terminatore '\0'
+    new_entries[0].ip[sizeof(new_entries[0].ip) - 1] = '\0';
+    new_entries[0].mac[sizeof(new_entries[0].mac) - 1] = '\0';
+
+    new_count = 1; // La cache ora contiene 1 entry
+
+
     char line[LINE_MAX_LEN];
     while (fgets(line, sizeof(line), file)) {
+
+        // delete del \n e \r
+        line[strcspn(line, "\r\n")] = 0; 
+
+        // -----------------------------------------------------------
+
         if (new_count >= current_capacity) {
             current_capacity *= 2;
 
@@ -115,7 +130,19 @@ int lease_cache_check(lease_cache_t *cache, const char *search_ip_str, const cha
     pthread_mutex_lock(cache->mutex);
     
     for (size_t i = 0; i < cache->count; i++) {
-        if (strcmp(cache->entries[i].ip, search_ip_str) == 0 && strcmp(cache->entries[i].mac, search_mac_str) == 0) {
+
+        //     // DEBUG: Stampa sicura dei dati della cache (MAX_IP_LEN-1 e MAX_MAC_LEN-1)
+        // // Usiamo (lunghezza massima - 1) per stare sicuri
+        // printf("DEBUG: Cache[%zu] - IP: '%.*s', MAC: '%.*s'\n", 
+        //     i, IP_LEN - 1, cache->entries[i].ip, 
+        //         MAC_LEN - 1, cache->entries[i].mac);
+
+        // // DEBUG: Stampa sicura dei dati di ricerca
+        // printf("DEBUG: Search      - IP: '%.*s', MAC: '%.*s'\n", 
+        //     IP_LEN - 1, search_ip_str, 
+        //     MAC_LEN - 1, search_mac_str);
+
+        if (strcmp(cache->entries[i].ip, search_ip_str) == 0 && strcasecmp(cache->entries[i].mac, search_mac_str) == 0) {
             found = 1;
             break;
         }

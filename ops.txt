@@ -1,1 +1,0 @@
-gcc -Wall -Wextra queue.c main.c receiver.c analyzer.c lease_t.c -o network_analyzer -lpcap -lpthread

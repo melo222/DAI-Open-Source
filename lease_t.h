@@ -9,6 +9,8 @@
 #define LINE_MAX_LEN 256
 #define MAC_LEN 17
 #define IP_LEN INET_ADDRSTRLEN
+#define ROUTER_IP_STR   "192.168.10.1"
+#define ROUTER_MAC_STR  "08:00:27:68:55:09" 
 
 // associazione IP-MAC
 typedef struct {
