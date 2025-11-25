@@ -1,0 +1,71 @@
+Avvio dei thread ricevitori...
+Thread Updater Lease avviato (Intervallo: 5 sec)
+
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+
+---Cache lease DHCP updated---
+
+	 - Thread Receiver ARP avviato per l'interfaccia: enp0s8
+Avvio dei thread analizzatori...
+
+Programma avviato. Premere Ctrl+C per terminare.
+
+	 - Thread Analyzer numero:2 avviato
+	 - Thread Analyzer numero:1 avviato
+[MONITOR] Time: 1.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 2.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 3.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.13
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.13
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.13
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+[MONITOR] Time: 4.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 5.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 6.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.1
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.1
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+[1|enp0s8] Associazione memorizzata in arp_association_t:
+   [-] MAC -> 		08:00:27:d0:7d:12 
+   [-] IP -> 		192.168.10.1
+   [-] SENDER MAC ->	08:00:27:d0:7d:12
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 123.05 us)==============
+==========MAC=08:00:27:d0:7d:12=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 534.77 us)==============
+==========MAC=08:00:27:d0:7d:12=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 136.54 us)==============
+==========MAC=08:00:27:d0:7d:12=============
+[MONITOR] Time: 7.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 3
+[MONITOR] Time: 8.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 3
+[MONITOR] Time: 9.0s | Last Interval Count: 0 | Queue: 0.0% | Latency: 0.00 us | Attacks: 3

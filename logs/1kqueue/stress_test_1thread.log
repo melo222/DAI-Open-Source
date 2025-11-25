@@ -1,0 +1,87 @@
+Avvio dei thread ricevitori...
+Thread Updater Lease avviato (Intervallo: 5 sec)
+
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+	 - Thread Receiver ARP avviato per l'interfaccia: enp0s8
+Avvio dei thread analizzatori...
+
+Programma avviato. Premere Ctrl+C per terminare.
+
+	 - Thread Analyzer numero:1 avviato
+[MONITOR] Time: 1.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 2.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 3.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 4.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 5.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 6.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 7.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 1199.18 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 4514.90 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 7266.06 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 7113.52 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 7583.60 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 6259.53 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+[MONITOR] Time: 8.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 6
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 1643.39 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 5972.99 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 9906.21 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+============================================
+====== ### ALLERT ### ATTACCO RILEVATO =====
+============(Latenza: 14194.24 us)==============
+==========MAC=08:00:27:3c:af:b2=============
+[MONITOR] Time: 9.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 10
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 10.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 10
+[MONITOR] Time: 11.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 10

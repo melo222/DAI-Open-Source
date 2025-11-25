@@ -4,13 +4,15 @@
 #include <pthread.h>
 #include <arpa/inet.h>   
 
-
+#define UPDATE_INTERVAL 5
 #define LEASES_FILE "/var/lib/misc/dnsmasq.leases"
 #define LINE_MAX_LEN 256
 #define MAC_LEN 17
 #define IP_LEN INET_ADDRSTRLEN
 #define ROUTER_IP_STR   "192.168.10.1"
 #define ROUTER_MAC_STR  "08:00:27:68:55:09" 
+#define ROUTER_IP_STR2   "192.168.20.1"
+#define ROUTER_MAC_STR2  "08:00:27:02:39:b1" 
 
 // associazione IP-MAC
 typedef struct {

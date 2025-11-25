@@ -11,6 +11,7 @@ typedef struct {
     pthread_mutex_t* stdout_mutex;
     lease_cache_t *lease_cache;
     arp_association_queue_t *queue;
+    dai_metrics_t *metrics;  // aggiunta delle metriche
 } analyzer_t_args;
 
 pthread_t start_analyzer_thread(analyzer_t_args* args, pthread_mutex_t* mutex);

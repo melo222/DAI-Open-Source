@@ -13,6 +13,7 @@ void arp_queue_init(arp_association_queue_t *queue, pthread_mutex_t *stdout_mute
     pthread_mutex_init(&queue->mutex, NULL);
     pthread_cond_init(&queue->not_full, NULL);
     pthread_cond_init(&queue->not_empty, NULL);
+    queue->peak_count = 0;
 }
 
 void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association) {
@@ -33,6 +34,12 @@ void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t a
     queue->buffer[queue->tail] = new_association;
     queue->tail = (queue->tail + 1) % ARP_QUEUE_SIZE; 
     queue->count++;
+
+    // --- calcolo del max count per la coda ---
+    if (queue->count > queue->peak_count) {
+        queue->peak_count = queue->count;
+    }
+    // ------------------------------
 
     pthread_cond_signal(&queue->not_empty);
 

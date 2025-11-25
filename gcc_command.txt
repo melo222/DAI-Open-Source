@@ -1,1 +1,1 @@
-gcc -Wall -Wextra queue.c main.c receiver.c analyzer.c lease_t.c -o dai_open_source -lpcap -lpthread
+gcc -Wall -Wextra queue.c main.c receiver.c analyzer.c lease_t.c monitor_t.c -o dai_open_source -lpcap -lpthread

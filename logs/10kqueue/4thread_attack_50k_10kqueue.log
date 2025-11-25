@@ -1,0 +1,97 @@
+Avvio dei thread ricevitori...
+Thread Updater Lease avviato (Intervallo: 5 sec)
+
+Avvio dei thread analizzatori...
+
+Programma avviato. Premere Ctrl+C per terminare.
+
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+	 - Thread Analyzer numero:4 avviato
+	 - Thread Analyzer numero:3 avviato
+	 - Thread Analyzer numero:2 avviato
+	 - Thread Analyzer numero:1 avviato
+	 - Thread Receiver ARP avviato per l'interfaccia: enp0s8
+[MONITOR] Time: 1.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 2.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 3.0s | Count: 300 | Peak Queue: 0.0% | Latency: 13.19 us | Attacks: 1727
+[MONITOR] Time: 4.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 3451
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 5.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 5175
+[MONITOR] Time: 6.0s | Count: 561 | Peak Queue: 0.0% | Latency: 12.79 us | Attacks: 8623
+[MONITOR] Time: 7.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 10347
+[MONITOR] Time: 8.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 12071
+[MONITOR] Time: 9.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 15519
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 10.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 17243
+[MONITOR] Time: 11.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 18967
+[MONITOR] Time: 12.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 20691
+[MONITOR] Time: 13.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 24139
+[MONITOR] Time: 14.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 25863
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 15.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 27587
+[MONITOR] Time: 16.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 31035
+[MONITOR] Time: 17.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 32759
+[MONITOR] Time: 18.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 34483
+[MONITOR] Time: 19.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 37931
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 20.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 39655
+[MONITOR] Time: 21.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 41379
+[MONITOR] Time: 22.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 44827
+[MONITOR] Time: 23.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 46551
+[MONITOR] Time: 24.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 48275
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:ee:7c:48 IP=192.168.20.30
+	5) MAC=08:00:27:3c:af:b2 IP=192.168.20.20
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 25.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 49944

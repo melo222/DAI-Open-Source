@@ -2,19 +2,14 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <unistd.h>
+
 #include "arp_queue.h"
 #include "lease_t.h"
 #include "receiver_t.h"
 #include "analyzer_t.h"
+#include "monitor_t.h"
 
-// funzione per avviare ogni thread ricevitore ARP
-// pthread_t start_receiver_thread(const char *iface_name);
-
-// funzione per avviare il pool di thread analizzatori di ARP
-// void start_arp_analyzer_pool(int num_threads);
-
-// mutex per la gestione concorrente di stdout
-// pthread_mutex_t stdout_mutex;
 
 int main(int argc, char *argv[]) {
 
@@ -26,17 +21,33 @@ int main(int argc, char *argv[]) {
     }
 
     // check num analyzers
-
     int num_analyzer = atoi(argv[argc - 1]);
     if (num_analyzer <= 0) {
         fprintf(stderr, "Il numero di thread analizzatori deve essere positivo.\n");
         return 1;
     }
 
+
+    /* --- INIZIALIZZAZIONE RISORSE CONDIVISE --- */
+
     //STDOUT_MUTEX
     // inizializzo il mutex per stdout
     pthread_mutex_t stdout_mutex;    
     pthread_mutex_init(&stdout_mutex, NULL);
+
+    // METRICHE
+    dai_metrics_t metrics;
+    metrics.total_processed = 0;
+    metrics.attacks_detected = 0;
+    metrics.total_latency_accum = 0.0;
+    pthread_mutex_init(&metrics.mutex, NULL);
+
+    // File CSV
+    FILE *csv_file = fopen("./logs/2,5kqueue/multiLAN_2thread_10legit_50k_20attack_50k.csv", "w");
+    if (csv_file == NULL) {
+        perror("Impossibile creare il file di log statistiche");
+        return 1;
+    }
 
     // QUEUE
     // coda condivisa di associazioni ARP 
@@ -45,17 +56,18 @@ int main(int argc, char *argv[]) {
     arp_queue_init(&arp_queue,&stdout_mutex);
 
 
-    // LEASE UPDATER
+    /* --- AVVIO THREADS --- */
+
+    // 1. LEASE UPDATER
     // parametri
     lease_cache_t lease_cache; 
     pthread_t updater_tid;
     lease_updater_t_args updater_args;
-    int UPDATE_INTERVAL = 5; 
     
     // init e caricamento entry all'avviop
     lease_cache_init(&lease_cache);
     lease_cache.stdout_mutex = &stdout_mutex;
-    lease_cache_update(&lease_cache);
+    lease_cache_update(&lease_cache); // Primo caricamento immediato
 
     //setting dei parametri
     updater_args.cache = &lease_cache;
@@ -64,14 +76,28 @@ int main(int argc, char *argv[]) {
     // avvio del thread
     updater_tid = start_lease_updater_thread(&updater_args);
 
+    // 2. MONITOR THREAD (Nuovo modulo)
+    pthread_t monitor_tid;(void)monitor_tid;
+    // Alloco argomenti nello heap per pulizia, o uso una struct statica
+    monitor_args_t *monitor_args = malloc(sizeof(monitor_args_t));
+    if (monitor_args == NULL) {
+         perror("Errore malloc monitor"); return 1; 
+    }
 
-    // RECEIVERS
+    monitor_args->metrics = &metrics;
+    monitor_args->queue = &arp_queue;
+    monitor_args->stdout_mutex = &stdout_mutex;
+    monitor_args->csv_file = csv_file;
+    
+    monitor_tid = start_monitor_thread(monitor_args);
+
+
+    // 3. RECEIVERS
     // n receivers threads
     int num_receivers = argc-2;
     pthread_t receiver_threads[num_receivers];
     // threads args
-    receiver_t_args *receiver_args;
-    receiver_args = calloc(num_receivers,sizeof(receiver_t_args));
+    receiver_t_args *receiver_args = calloc(num_receivers,sizeof(receiver_t_args));
 
     if (receiver_args == NULL) {
         perror("errore nell'allocazione della memoria degli argomenti dei threads receivers\n");
@@ -79,7 +105,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("Avvio dei thread ricevitori per le interfacce:\n");
+    printf("Avvio dei thread ricevitori...\n");
 
     for(int i=0; i < num_receivers; i++) {
         receiver_args[i].num = i+1;
@@ -89,17 +115,15 @@ int main(int argc, char *argv[]) {
     }
     
     
-    // ANALYZERS
+    // 4. ANALYZERS
     pthread_t analyzers_threads[num_analyzer];
-    analyzer_t_args *analyzer_args;
-    analyzer_args = calloc(num_analyzer,sizeof(analyzer_t_args));
+    analyzer_t_args *analyzer_args = calloc(num_analyzer,sizeof(analyzer_t_args));
     if (analyzer_args == NULL) {
         perror("errore nell'allocazione della memoria degli argomenti dei threads analyzers\n");
-        pthread_mutex_destroy(&stdout_mutex);
         return 1;
     }
     pthread_mutex_lock(&stdout_mutex);
-    printf("Avvio dei thread analizzatori:\n");
+    printf("Avvio dei thread analizzatori...\n");
     pthread_mutex_unlock(&stdout_mutex);
 
     // avvio gli analyzers
@@ -107,11 +131,14 @@ int main(int argc, char *argv[]) {
         analyzer_args[i].num = i+1;
         analyzer_args[i].queue = &arp_queue;
         analyzer_args[i].lease_cache = &lease_cache;
+        analyzer_args[i].metrics = &metrics;
         analyzers_threads[i] = start_analyzer_thread(&analyzer_args[i],&stdout_mutex);
     }
 
-
+    // ----- AVVIO DEL PROGRAMMA ------
     printf("\nProgramma avviato. Premere Ctrl+C per terminare.\n\n");
+
+    // --- ATTESA TERMINAZIONE (JOIN) ---
 
     for (int i = 0; i < num_receivers; i++) {
         pthread_join(receiver_threads[i], NULL);
@@ -122,7 +149,14 @@ int main(int argc, char *argv[]) {
     }
 
     pthread_join(updater_tid, NULL);
-    
+    // Il monitor gira all'infinito, ma se volessimo joinarlo:
+    // pthread_join(monitor_tid, NULL);
+
+    // Pulizia finale (raggiungibile solo se i thread terminano)
+    fclose(csv_file);
+    free(monitor_args);
+    free(receiver_args);
+    free(analyzer_args);
     pthread_exit(NULL);
 
     return 0;

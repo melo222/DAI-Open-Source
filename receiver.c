@@ -7,15 +7,7 @@
 #include <arpa/inet.h>
 #include "arp_queue.h" // header per la coda ARP
 #include "receiver_t.h"
-// Dichiarazione esterna del mutex
-// extern pthread_mutex_t stdout_mutex;
-
-
-// struttura per passare l'interfaccia al thread (non serve più il filtro qui)
-// typedef struct {
-//     char *interface;
-//     // + altro ?
-// } interface;
+#include <time.h> // per le metriche
 
 // prototipo per inserire l'associazione ARP nella coda
 void enqueue_arp_association(arp_association_queue_t *queue, arp_association_t association);
@@ -25,7 +17,7 @@ void *receiver_thread(void *args) {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
     struct bpf_program fp;
-    bpf_u_int32 net;
+    bpf_u_int32 net = 0;
     // bpf_u_int32 mask;
 
     pthread_mutex_lock(t_args->stdout_mutex);
@@ -83,6 +75,10 @@ void *receiver_thread(void *args) {
                 memcpy(association.mac_addr, mac_bind, ETH_ALEN);
                 memcpy(&association.ip_addr, ip_bind, 4);
                 memcpy(association.mac_addr_sender, mac_sender, ETH_ALEN);
+
+                // aggiunta delle metriche
+                // Catturiamo il tempo corrente (Monotonic clock è immune ai cambi di orario di sistema)
+                clock_gettime(CLOCK_MONOTONIC, &association.reception_time);
                 
                 char ip_str[INET_ADDRSTRLEN];
                 char mac_str[18],mac_sender_str[18];
@@ -90,11 +86,15 @@ void *receiver_thread(void *args) {
                 // conversione MAC address
                 mac_to_str(association.mac_addr,mac_str);
                 mac_to_str(association.mac_addr_sender,mac_sender_str);
-                // stampa
-                pthread_mutex_lock(t_args->stdout_mutex);
-                printf("[%d|%s] Associazione memorizzata in arp_association_t:\n   [-] MAC -> \t\t%s \n   [-] IP -> \t\t%s\n   [-] SENDER MAC ->\t%s\n",
-                    t_args->num, t_args->interface, mac_str, ip_str, mac_sender_str);
-                pthread_mutex_unlock(t_args->stdout_mutex);
+
+
+                // commento la stampa per i test di stress
+                // pthread_mutex_lock(t_args->stdout_mutex);
+                // printf("[%d|%s] Associazione memorizzata in arp_association_t:\n   [-] MAC -> \t\t%s \n   [-] IP -> \t\t%s\n   [-] SENDER MAC ->\t%s\n",
+                //     t_args->num, t_args->interface, mac_str, ip_str, mac_sender_str);
+                // pthread_mutex_unlock(t_args->stdout_mutex);
+
+
                 // metto in coda l'associazione appena costituita
                 arp_association_queue_t *arp_queue = t_args->queue; // Dichiarazione della coda globale
                 enqueue_arp_association(arp_queue, association); // chiamata di enqueue in queue.c

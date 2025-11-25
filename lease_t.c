@@ -49,7 +49,7 @@ int lease_cache_update(lease_cache_t *cache) {
     size_t current_capacity = 32;
     size_t new_count = 0;
 
-    new_entries = malloc(current_capacity * sizeof(lease_entry_t));
+    new_entries = malloc(current_capacity * sizeof(lease_entry_t) * 2);
     if (new_entries == NULL) {
         fclose(file);
         return -1;
@@ -62,7 +62,14 @@ int lease_cache_update(lease_cache_t *cache) {
     new_entries[0].ip[sizeof(new_entries[0].ip) - 1] = '\0';
     new_entries[0].mac[sizeof(new_entries[0].mac) - 1] = '\0';
 
-    new_count = 1; // La cache ora contiene 1 entry
+    //INSERIMENTO DELL'ENTRY FISSA DEL ROUTER
+    strncpy(new_entries[1].ip, ROUTER_IP_STR2, sizeof(new_entries[0].ip));
+    strncpy(new_entries[1].mac, ROUTER_MAC_STR2, sizeof(new_entries[0].mac));
+    // check terminatore '\0'
+    new_entries[1].ip[sizeof(new_entries[0].ip) - 1] = '\0';
+    new_entries[1].mac[sizeof(new_entries[0].mac) - 1] = '\0';
+
+    new_count = 2; // La cache ora contiene 1 entry
 
 
     char line[LINE_MAX_LEN];
@@ -145,6 +152,14 @@ int lease_cache_check(lease_cache_t *cache, const char *search_ip_str, const cha
         if (strcmp(cache->entries[i].ip, search_ip_str) == 0 && strcasecmp(cache->entries[i].mac, search_mac_str) == 0) {
             found = 1;
             break;
+        }
+        if (!found) {
+            int is_router_mac = (strcasecmp(search_mac_str, ROUTER_MAC_STR) == 0 || strcasecmp(search_mac_str, ROUTER_MAC_STR2) == 0);
+            int is_router_ip = (strcmp(search_ip_str, ROUTER_IP_STR) == 0 || strcmp(search_ip_str, ROUTER_IP_STR2) == 0);
+
+            if (is_router_mac && is_router_ip) {
+                found = 1;
+            }
         }
     }
     

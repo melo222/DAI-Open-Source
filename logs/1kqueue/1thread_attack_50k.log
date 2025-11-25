@@ -1,0 +1,90 @@
+Avvio dei thread ricevitori...
+Thread Updater Lease avviato (Intervallo: 5 sec)
+
+Avvio dei thread analizzatori...
+
+Programma avviato. Premere Ctrl+C per terminare.
+
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+	 - Thread Analyzer numero:1 avviato
+	 - Thread Receiver ARP avviato per l'interfaccia: enp0s8
+[MONITOR] Time: 1.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 2.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 0
+[MONITOR] Time: 3.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 1724
+[MONITOR] Time: 4.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 3448
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 5.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 5172
+[MONITOR] Time: 6.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 6896
+[MONITOR] Time: 7.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 10344
+[MONITOR] Time: 8.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 12068
+[MONITOR] Time: 9.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 13792
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 10.0s | Count: 1599 | Peak Queue: 100.0% | Latency: 2221.83 us | Attacks: 17240
+[MONITOR] Time: 11.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 18964
+[MONITOR] Time: 12.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 20688
+[MONITOR] Time: 13.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 22412
+[MONITOR] Time: 14.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 25860
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 15.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 27584
+[MONITOR] Time: 16.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 29308
+[MONITOR] Time: 17.0s | Count: 1724 | Peak Queue: 100.0% | Latency: 1128.03 us | Attacks: 32756
+[MONITOR] Time: 18.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 34480
+[MONITOR] Time: 19.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 36204
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 20.0s | Count: 1724 | Peak Queue: 100.0% | Latency: 1758.94 us | Attacks: 39652
+[MONITOR] Time: 21.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 41376
+[MONITOR] Time: 22.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 43100
+[MONITOR] Time: 23.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 44824
+[MONITOR] Time: 24.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 48272
+---LEASES CACHE---
+	0) MAC=08:00:27:68:55:09 IP=192.168.10.1
+	1) MAC=08:00:27:02:39:b1 IP=192.168.20.1
+	2) MAC=08:00:27:3c:af:b2 IP=192.168.10.20
+	3) MAC=08:00:27:af:2a:87 IP=192.168.10.17
+	4) MAC=08:00:27:d0:7d:12 IP=192.168.10.13
+
+---Cache lease DHCP updated---
+
+[MONITOR] Time: 25.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 49996
+[MONITOR] Time: 26.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 50000
+[MONITOR] Time: 27.0s | Count: 0 | Peak Queue: 0.0% | Latency: 0.00 us | Attacks: 50000
